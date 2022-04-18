@@ -7,7 +7,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 
@@ -28,34 +29,26 @@ public class testToken {
 //    PS256: RSASSA-PSS using SHA-256 and MGF1 with SHA-256
 //    PS384: RSASSA-PSS using SHA-384 and MGF1 with SHA-384
 //    PS512: RSASSA-PSS using SHA-512 and MGF1 with SHA-512
-
+    static final String secret="99c2918fe19d30bce25abfac8a3733ec";
+    static SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
     public static void main(String[] args) {
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        String jws = Jwts.builder().setSubject("NB").signWith(key).compact();
+
+        String jws = Jwts.builder().setSubject("中国").signWith(key,SignatureAlgorithm.HS256).compact();
         System.out.println(jws);
         System.out.println(
-                Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jws).getBody().getSubject().equals("NB")
+                Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jws).getBody().getSubject().toString()
         );
-
     }
 
     @Test
     public void t1(){
-        Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        String jwts = Jwts.builder().setSubject("Joe").signWith(key).compact();
-        log.info(jwts);
-        Key ekey=Keys.secretKeyFor(SignatureAlgorithm.HS384);
+       String jwts="eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJOQiJ9.y5SRUxg9i_dAJtXBFv6_bowwcgNbWP-XZ-mIMaV_nSw";
         try {
-
-            Jwts.parserBuilder().setSigningKey(ekey).build().parseClaimsJws(jwts).getBody().getSubject().equals("NB");
             log.info(Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwts).getBody().getSubject());
-            log.info("++++++");
-            //OK, we can trust this JWT
-
+            log.info("解析成功！");
         } catch (JwtException e) {
-            log.info("------");
-            //don't trust the JWT!
+            log.info("解析失败！");
         }
     }
 
