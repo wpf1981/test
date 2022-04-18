@@ -16,7 +16,7 @@ spring:
 
   #jpa配置
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update #create
   mvc:

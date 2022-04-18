@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -22,7 +23,7 @@ public class SwaggerConfig {
                 .useDefaultResponseMessages(false)
                 .select()
 //                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
-//                .apis(RequestHandlerSelectors.basePackage("com.example.w2203.Controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.example"))//可以注释掉，显示所有接口，有自动生成的接口
                 .paths(PathSelectors.any()) //所有路径
                 .build();
     }

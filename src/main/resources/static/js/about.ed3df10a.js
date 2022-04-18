@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkvue_app"]=self["webpackChunkvue_app"]||[]).push([[443],{4329:function(n,t,e){e.r(t),e.d(t,{default:function(){return p}});var u=e(3396);const c=(0,u._)("div",{class:"btn"},"发布",-1);function r(n,t,e,r,s,a){const l=(0,u.up)("titlecom");return(0,u.wg)(),(0,u.iD)("div",null,[(0,u.Wm)(l,null,{default:(0,u.w5)((()=>[c])),_:1})])}var s=e(8660),a=(0,u.aZ)({components:{Titlecom:s.Z},setup(){return{}}}),l=e(89);const o=(0,l.Z)(a,[["render",r]]);var p=o}}]);
+//# sourceMappingURL=about.ed3df10a.js.map

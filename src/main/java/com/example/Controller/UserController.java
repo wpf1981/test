@@ -23,24 +23,28 @@ public class UserController {
     public Response findUserList(){
         return Response.success(userRepository.findAll(),"所有数据！");
     }
+
     @GetMapping("/user/{id}")
     @ApiOperation("获取一条数据")
     public Response getUser(@PathVariable("id") String id){
-        return Response.success(userRepository.findById(id),"获取一条数据！");
+        log.info(String.valueOf(userRepository.findById(id)));
+        return Response.success(userRepository.getById(id),"获取一条数据！");
     }
+
     @DeleteMapping("/user/{id}")
     @ApiOperation("删除一条数据")
     public Response deleteUser(@PathVariable("id") String id){
         userRepository.deleteById(id);
-        return Response.success();
+        return Response.success(200,"ok");
     }
-    @PutMapping("/user")
+    @PutMapping("/user/{id}")
     @ApiOperation("更新数据")
-    public Response updateUser(@RequestParam String u_id,
-                               @RequestParam String u_name){
+    public Response updateUser(@PathVariable("id") String id,
+//            @RequestParam String id,
+                               @RequestBody User n_user){
         User user=new User();
-        user=userRepository.getById(u_id);
-        user.setUserName(u_name);
+        user=userRepository.getById(id);
+        user.setUserName(n_user.getUserName());
         return Response.success(userRepository.save(user),"还可以吧！");
     }
 
@@ -51,4 +55,20 @@ public class UserController {
         return Response.success(userRepository.save(user),"还可以吧！");
     }
 
+    @PostMapping("/login")
+    @ApiOperation("用户登录")
+    public Response loginUser(@RequestBody User user){
+        if(userRepository.existsById(user.getUserId())==false){
+            ;
+            return Response.success(201,"无此用户！");
+        }else {
+            User userdata=new User();
+            userdata=userRepository.getById(user.getUserId());
+            if (user.getPassWord().equals(userdata.getUserData())){
+                return Response.success(userRepository.save(userdata),"登录成功!");
+            }else {
+                return Response.success(200,"密码错误！");
+            }
+        }
+    }
 }

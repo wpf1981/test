@@ -22,10 +22,14 @@ public class User {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     @ApiModelProperty(value = "ID")
     private String userId;
-    @Column(length = 8)
+    @Column(nullable = false,length = 8)
     private String userName;
     @Column(length = 20)
     private String userData;
     @Column(length = 20)
     private String ct;
+    @Column(length = 128)
+    private String token;
+    @Column(nullable = false,length = 20)
+    private String passWord;
 }

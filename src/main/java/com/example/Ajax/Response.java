@@ -7,8 +7,8 @@ import lombok.Data;
 @ApiModel("数据处理")
 public class Response {
     private boolean isok;
-    private int code;
-    private String message;
+    private int code=200;
+    private String message= "成功";
     private Object data;
 
     public Response(){}
@@ -16,14 +16,20 @@ public class Response {
     public static Response success(){
         Response response=new Response();
         response.setIsok(true);
-        response.setCode(200);
-        response.setMessage("ok");
         return response;
     }
+
+    public static Response success(int code,String message){
+        Response response=new Response();
+        response.setIsok(true);
+        response.setCode(code);
+        response.setMessage(message);
+        return response;
+    }
+
     public static Response success(Object obj,String message){
         Response response=new Response();
         response.setIsok(true);
-        response.setCode(200);
         response.setMessage(message);
         response.setData(obj);
         return response;
