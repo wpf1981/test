@@ -28,8 +28,7 @@ public class User {
     private String userData;
     @Column(length = 20)
     private String ct;
-    @Column(length = 128)
-    private String token;
     @Column(nullable = false,length = 20)
     private String passWord;
+    private String token;
 }

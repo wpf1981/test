@@ -3,12 +3,17 @@ package com.example.Controller;
 import com.example.Ajax.Response;
 import com.example.Entity.User;
 import com.example.Repository.UserRepository;
+import com.example.utils.MyJwt;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -55,20 +60,34 @@ public class UserController {
         return Response.success(userRepository.save(user),"还可以吧！");
     }
 
-    @PostMapping("/login")
+    @GetMapping("/login")
     @ApiOperation("用户登录")
-    public Response loginUser(@RequestBody User user){
+    public Response loginUser(User user){
+        Map<String, Object> map = new HashMap<>();
+        map.put("userid",user.getUserId());
+        map.put("username",user.getUserName());
         if(userRepository.existsById(user.getUserId())==false){
-            ;
             return Response.success(201,"无此用户！");
         }else {
             User userdata=new User();
             userdata=userRepository.getById(user.getUserId());
-            if (user.getPassWord().equals(userdata.getUserData())){
+            if (user.getPassWord().equals(userdata.getPassWord())){
+                userdata.setToken(MyJwt.createJwt(5L,map));
+                userdata.setCt(String.valueOf(new Date(System.currentTimeMillis())));
+//                MyJwt.
+                log.info("获取token："+userdata.getToken());
                 return Response.success(userRepository.save(userdata),"登录成功!");
             }else {
-                return Response.success(200,"密码错误！");
+                return Response.success(202,"密码错误！");
             }
         }
+    }
+
+    @GetMapping("/checkToken")
+    public Boolean checkToken(HttpServletRequest request){
+        String token=request.getHeader("token");
+        log.info("验证：" +token);
+        log.info("==="+MyJwt.parseJwt(token));
+        return MyJwt.parseJwt(token);
     }
 }

@@ -1,13 +1,11 @@
-package com.example;
+package com.example.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -15,29 +13,35 @@ import java.util.Map;
 public class JwtUtils {
     //    @Value("{jwt.skin.key}")
     //key的大小必须大于或等于256bit,需要32位英文字符，一个英文字符为：8bit,一个中文字符为12bit
-    private String key="ssssssssssdfdsafasfdssdfsfsfssfs";
+    static String key="ssssssssssdfdsafasfdssdfsfsfssfs";
     //设置加密算法
-    private SignatureAlgorithm signatureAlgorithm= SignatureAlgorithm.HS256;
+    static SignatureAlgorithm signatureAlgorithm= SignatureAlgorithm.HS256;
     /**
      * 获取转换后的私钥对象
      * @return
      */
-    public SecretKey getSecretKey(){
+    static SecretKey getSecretKey(){
         return Keys.hmacShaKeyFor(key.getBytes());
     }
+    static final SecretKey getSecretKey = Keys.hmacShaKeyFor(key.getBytes());//StandardCharsets.UTF_8
     /**
      * 生成JWT
      * @param exp 指定过期时间，不能小于当前时间
      * @param payLoad 携带的数据
      * @return
      */
-    @Test
-    public String createJwt(Date exp , Map<String,Object> payLoad){
+//    static long time = 1000 * 60 * 60 * 24;
+    static long time = 10000*2;
+    static Date exp= new Date(System.currentTimeMillis() + time);
+
+    public static String createJwt(Map<String,Object> payLoad){
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setHeaderParam("slg", "HS256")
                 .setClaims(payLoad)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(exp)
-                .signWith(getSecretKey(),signatureAlgorithm)
+                .signWith(getSecretKey,signatureAlgorithm)
                 .compact();
     }
 
@@ -46,19 +50,19 @@ public class JwtUtils {
      * @param jwsString
      * @return
      */
-    public Boolean parseJwt(String jwsString){
-        boolean result= false;
+    public  static Boolean parseJwt(String jwsString){
+        if(jwsString==null){
+            return false;
+        }
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(getSecretKey())
+                    .setSigningKey(getSecretKey)
                     .build()
                     .parseClaimsJws(jwsString);
-            result=true;
         }catch (JwtException e){
-            result=false;
-        }finally {
-            return result;
+           return false;
         }
+        return true;
     }
 
     /**
@@ -66,11 +70,11 @@ public class JwtUtils {
      * @param jwsString
      * @return
      */
-    public Jws parseJwtResultJws(String jwsString){
+    public  static Jws parseJwtResultJws(String jwsString){
         Jws<Claims> claims=null;
         try {
             claims = Jwts.parserBuilder()
-                    .setSigningKey(getSecretKey())
+                    .setSigningKey(getSecretKey)
                     .build()
                     .parseClaimsJws(jwsString);
         }catch (JwtException e){
@@ -83,7 +87,7 @@ public class JwtUtils {
      * @param jwsString
      * @return
      */
-    public Map<String,Object> getHeader(String jwsString){
+    public static Map<String,Object> getHeader(String jwsString){
         return parseJwtResultJws(jwsString).getHeader();
     }
 
@@ -92,7 +96,7 @@ public class JwtUtils {
      * @param jwsString
      * @return
      */
-    public Map<String,Object> getPayLoad(String jwsString){
+    public static Map<String,Object> getPayLoad(String jwsString){
         return ((Map<String, Object>) (parseJwtResultJws(jwsString)).getBody());
     }
 
@@ -101,21 +105,21 @@ public class JwtUtils {
      * @param jwsString
      * @return
      */
-    public Map<String,Object> getPayLoadALSOExcludeExpAndIat(String jwsString){
+    public static Map<String,Object> getPayLoadALSOExcludeExpAndIat(String jwsString){
         Map<String, Object> map = getPayLoad(jwsString);
         map.remove("exp");
         map.remove("iat");
         return map;
     }
 
-    public static void main(String[] args) {
-        JwtUtils jwtUtils = new JwtUtils();
-        Date exp = new Date(System.currentTimeMillis()+60*60*24);
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("name","张三");
-        String jwt = jwtUtils.createJwt(exp, hashMap);
-        System.out.println(jwt);
-        System.out.println(jwtUtils.getPayLoadALSOExcludeExpAndIat(jwt));
-    }
+//    public static void main(String[] args) {
+//        JwtUtils jwtUtils = new JwtUtils();
+//        Date exp = new Date(System.currentTimeMillis()+60*60*24);
+//        HashMap<String, Object> hashMap = new HashMap<>();
+//        hashMap.put("name","张三");
+//        String jwt = jwtUtils.createJwt(exp, hashMap);
+//        System.out.println(jwt);
+//        System.out.println(jwtUtils.getPayLoadALSOExcludeExpAndIat(jwt));
+//    }
 
 }
