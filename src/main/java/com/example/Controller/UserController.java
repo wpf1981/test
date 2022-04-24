@@ -66,13 +66,13 @@ public class UserController {
         Map<String, Object> map = new HashMap<>();
         map.put("userid",user.getUserId());
         map.put("username",user.getUserName());
-        if(userRepository.existsById(user.getUserId())==false){
+        if(!userRepository.existsById(user.getUserId())){
             return Response.success(201,"无此用户！");
         }else {
             User userdata=new User();
             userdata=userRepository.getById(user.getUserId());
             if (user.getPassWord().equals(userdata.getPassWord())){
-                userdata.setToken(MyJwt.createJwt(5L,map));
+                userdata.setToken(MyJwt.createJwt(60L,map));
                 userdata.setCt(String.valueOf(new Date(System.currentTimeMillis())));
 //                MyJwt.
                 log.info("获取token："+userdata.getToken());

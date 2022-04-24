@@ -22,7 +22,17 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher #springboot 2.6.3集成swagger3启动失败解决方案
-
+#    static-path-pattern: '/**'
+#  web:
+#    upload-path: D:/data/
+#    resources:
+#      static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${web.upload-path}
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 0
+      max-file-size: 100MB
+      max-request-size: 100MB
 #配置服务器端口
 server:
-  port: 8800
+  port: 8801

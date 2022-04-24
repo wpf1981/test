@@ -30,11 +30,12 @@ public class JwtUtils {
      * @param payLoad 携带的数据
      * @return
      */
-//    static long time = 1000 * 60 * 60 * 24;
-    static long time = 10000*2;
-    static Date exp= new Date(System.currentTimeMillis() + time);
+    static long time = 1000 * 60 * 60 * 24;
+//    static long time = 1000*20;
+
 
     public static String createJwt(Map<String,Object> payLoad){
+        Date exp= new Date(System.currentTimeMillis() + time);
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setHeaderParam("slg", "HS256")
