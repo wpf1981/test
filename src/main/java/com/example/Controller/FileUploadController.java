@@ -6,6 +6,9 @@ import com.example.Repository.FilesRepostitory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,9 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @RequestMapping("/t2")
@@ -99,5 +100,41 @@ public class FileUploadController {
         ll.add("208:成功");
 
         return String.valueOf(ll);
+    }
+
+    @GetMapping("/filePage")
+    @ApiOperation("分页")
+    public Response filePage(Files files){
+
+        Map map=new HashMap();
+        map.put("page",files.getPage());
+        map.put("limit",files.getLimit());
+        log.info("********"+files.getUserId());
+        if(files.getUserId().isEmpty()) {
+            log.info("111111");
+            map.put("count", filesRepostitory.countPage());
+            map.put("listData", filesRepostitory.findPage(files.getLimit(), files.getPage()));
+        }else{
+            log.info("222222");
+            map.put("count", filesRepostitory.userCountPage(files.getUserId()));
+            map.put("listData", filesRepostitory.userFindPage(files.getLimit(), files.getPage(),files.getUserId()));
+        }
+        //
+//       List<Files> files1;
+//        files1=filesRepostitory.findPage(files.getLimit(),files.getPage());
+//        log.info(""+files1.stream().count());
+        //        log.info(""+map.get("listData"));
+        return Response.success(map,"查询完成！");
+    }
+
+//    @ResponseBody
+    @GetMapping("/course/list")
+    @ApiOperation("分页2")
+    public Response filePage2(@RequestParam(name = "pageNum", defaultValue = "0") int pageNum,
+                       @RequestParam(name = "pageSize", defaultValue = "2") int pageSize,
+                       @RequestParam(name = "sort", defaultValue = "file_id", required = false) String sort) {
+        PageRequest of = PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, sort);
+        Page<Files> page=filesRepostitory.findAll(of);
+        return Response.success(page,"查询完成！");
     }
 }

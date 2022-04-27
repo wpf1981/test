@@ -33,4 +33,8 @@ public class Files {
     private String status;
     @Column(nullable = false,length = 50)
     private String userId;
+
+    @Transient
+    private Long limit;
+    private Long page;
 }
