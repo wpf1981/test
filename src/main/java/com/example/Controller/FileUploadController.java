@@ -103,20 +103,18 @@ public class FileUploadController {
         return String.valueOf(ll);
     }
 
-    @GetMapping("/filePage")
-    @ApiOperation("分页")
+    @GetMapping("/Page3")
+    @ApiOperation("自定义分页")
     public Response filePage(Files files){
 
         Map map=new HashMap();
         map.put("page",files.getPage());
         map.put("limit",files.getLimit());
-        log.info("********"+files.getUserId());
-        if(files.getUserId().isEmpty()) {
-            log.info("111111");
+
+        if(files.getUserId()==null||files.getUserId().trim().isEmpty()) {
             map.put("count", filesRepostitory.countPage());
             map.put("listData", filesRepostitory.findPage(files.getLimit(), files.getPage()));
         }else{
-            log.info("222222");
             map.put("count", filesRepostitory.userCountPage(files.getUserId()));
             map.put("listData", filesRepostitory.userFindPage(files.getLimit(), files.getPage(),files.getUserId()));
         }
@@ -132,7 +130,7 @@ public class FileUploadController {
     @GetMapping("/list3")
     @ApiOperation("分页3")
     public Response filePage2(@RequestParam(name = "pageNum", defaultValue = "0") int pageNum,
-                       @RequestParam(name = "pageSize", defaultValue = "2") int pageSize,
+                       @RequestParam(name = "pageSize", defaultValue = "10") int pageSize,
                        @RequestParam(name = "sort", defaultValue = "fileId", required = false) String sort) {
         PageRequest of = PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, sort);
         Page<Files> page=filesRepostitory.findAll(of);
@@ -142,36 +140,40 @@ public class FileUploadController {
     @GetMapping("/listpage")
     @ApiOperation("分页2")
     public Response filePage3(Files files){
-
         if (files.getPage() == null){
             files.setPage(1L);
         }
-
         PageRequest of = PageRequest.of(files.getPage().intValue() - 1,6,Sort.Direction.DESC,"fileId");
-
         Page<Files> list = filesRepostitory.findAll(of);
-
         log.info("pageNum==" + list);
-
         return Response.success(list,"ok");
     }
 
-    @GetMapping("/page4")
+    @GetMapping("/filepage")
     @ApiOperation("分页4")
     public Response filePage4(Files files){
-
         if (files.getPage() == null){
             files.setPage(1L);
         }
-
-        Pageable pp=PageRequest.of(files.getPage().intValue() - 1,files.getLimit().intValue());
-
-        PageRequest of = PageRequest.of(files.getPage().intValue() - 1,files.getLimit().intValue(),Sort.Direction.DESC,"file_id");
-
-        Page<Files> list = filesRepostitory.findfilename(files.getUserId(),of);
-
-        log.info("pageNum==" + list);
-
-        return Response.success(list,"ok");
+        int page=files.getPage().intValue() - 1;
+        int limit=files.getLimit().intValue();
+        Pageable of=PageRequest.of(page,limit);
+//        PageRequest of = PageRequest.of(files.getPage().intValue() - 1,files.getLimit().intValue(),Sort.Direction.DESC,"file_id");
+        Page<Files> list;
+        log.info("userid::"+files.getUserId());
+        if(files.getUserId()==null||files.getUserId().trim().isEmpty()) {
+            log.info("----------");
+            list = filesRepostitory.findAll(of);
+        }else{
+            log.info("+++++++++++");
+            list = filesRepostitory.findFilename(files.getUserId(), of);
+        }
+        log.info("page::" + list.getContent());
+        Map map=new HashMap();
+        map.put("page",files.getPage());
+        map.put("limit",files.getLimit());
+        map.put("count", list.getTotalElements());
+        map.put("listData",list.getContent());
+        return Response.success(map,"ok");
     }
 }

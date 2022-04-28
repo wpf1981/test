@@ -15,14 +15,16 @@ public interface FilesRepostitory  extends JpaRepository<Files,String> ,
         QueryByExampleExecutor<Files> {
     public List<Files> findByfileName(String name);
 
-    @Query(value ="select * from w_files where file_id>:limit*(:page-1) limit :limit",nativeQuery = true)
+    @Query(value ="select * from w_files where file_id>:limit*(:page-1) limit :limit",
+            nativeQuery = true,countQuery = "select count(*) from w_files")
     public List<Files> findPage(Long limit,Long page);
 
     @Query(value ="select count(*) from w_files",nativeQuery = true)
     public Long countPage();
 
 
-    @Query(value ="select * from w_files where file_id>?1*(?2-1) and user_id=?3 limit ?1",nativeQuery = true)
+    @Query(value ="select * from w_files where file_id>?1*(?2-1) and user_id=?3 limit ?1",
+            nativeQuery = true,countQuery = "select count(*) from w_files where user_id=:userId")
     public List<Files> userFindPage(Long limit,Long page,String userId);
 
 
@@ -34,5 +36,5 @@ public interface FilesRepostitory  extends JpaRepository<Files,String> ,
     @Query(value = "select * from w_files where user_id=? \n#pageable\n",
             countQuery = "select count(*) from w_files where user_id=?",
             nativeQuery = true)
-    Page<Files> findfilename(String userId, Pageable pageable);
+    Page<Files> findFilename(String userId, Pageable pageable);
 }
