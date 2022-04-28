@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -128,13 +129,49 @@ public class FileUploadController {
     }
 
 //    @ResponseBody
-    @GetMapping("/course/list")
-    @ApiOperation("分页2")
+    @GetMapping("/list3")
+    @ApiOperation("分页3")
     public Response filePage2(@RequestParam(name = "pageNum", defaultValue = "0") int pageNum,
                        @RequestParam(name = "pageSize", defaultValue = "2") int pageSize,
-                       @RequestParam(name = "sort", defaultValue = "file_id", required = false) String sort) {
+                       @RequestParam(name = "sort", defaultValue = "fileId", required = false) String sort) {
         PageRequest of = PageRequest.of(pageNum, pageSize, Sort.Direction.DESC, sort);
         Page<Files> page=filesRepostitory.findAll(of);
         return Response.success(page,"查询完成！");
+    }
+
+    @GetMapping("/listpage")
+    @ApiOperation("分页2")
+    public Response filePage3(Files files){
+
+        if (files.getPage() == null){
+            files.setPage(1L);
+        }
+
+        PageRequest of = PageRequest.of(files.getPage().intValue() - 1,6,Sort.Direction.DESC,"fileId");
+
+        Page<Files> list = filesRepostitory.findAll(of);
+
+        log.info("pageNum==" + list);
+
+        return Response.success(list,"ok");
+    }
+
+    @GetMapping("/page4")
+    @ApiOperation("分页4")
+    public Response filePage4(Files files){
+
+        if (files.getPage() == null){
+            files.setPage(1L);
+        }
+
+        Pageable pp=PageRequest.of(files.getPage().intValue() - 1,files.getLimit().intValue());
+
+        PageRequest of = PageRequest.of(files.getPage().intValue() - 1,files.getLimit().intValue(),Sort.Direction.DESC,"file_id");
+
+        Page<Files> list = filesRepostitory.findfilename(files.getUserId(),of);
+
+        log.info("pageNum==" + list);
+
+        return Response.success(list,"ok");
     }
 }

@@ -1,12 +1,18 @@
 package com.example.Repository;
 
 import com.example.Entity.Files;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.QueryByExampleExecutor;
 
 import java.util.List;
 
-public interface FilesRepostitory  extends JpaRepository<Files,String> {
+public interface FilesRepostitory  extends JpaRepository<Files,String> ,
+        PagingAndSortingRepository<Files,String>,
+        QueryByExampleExecutor<Files> {
     public List<Files> findByfileName(String name);
 
     @Query(value ="select * from w_files where file_id>:limit*(:page-1) limit :limit",nativeQuery = true)
@@ -22,4 +28,11 @@ public interface FilesRepostitory  extends JpaRepository<Files,String> {
 
     @Query(value ="select count(*) from w_files where user_id=?",nativeQuery = true)
     public Long userCountPage(String userId);
+
+
+
+    @Query(value = "select * from w_files where user_id=? \n#pageable\n",
+            countQuery = "select count(*) from w_files where user_id=?",
+            nativeQuery = true)
+    Page<Files> findfilename(String userId, Pageable pageable);
 }
