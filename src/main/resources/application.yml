@@ -39,4 +39,7 @@ spring:
       max-request-size: 100MB
 #配置服务器端口
 server:
-  port: 8801
+  port: 8800
+
+myConfig:
+  fileUrl: localhost:8801\files\

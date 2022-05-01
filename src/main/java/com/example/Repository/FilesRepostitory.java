@@ -37,4 +37,10 @@ public interface FilesRepostitory  extends JpaRepository<Files,String> ,
             countQuery = "select count(*) from w_files where user_id=?",
             nativeQuery = true)
     Page<Files> findFilename(String userId, Pageable pageable);
+
+
+    @Query(value = "select * from w_files where file_name=?",nativeQuery = true)
+    Files findFileUrl(String fileName);
+
+    Files findByFileName(String fileName);
 }

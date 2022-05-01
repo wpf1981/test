@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ import java.util.Map;
 
 @Slf4j
 @RestController
+@CrossOrigin
 @RequestMapping("/t2")
 @Api(tags = "用户接口")
 public class UserController {
@@ -60,9 +62,23 @@ public class UserController {
         return Response.success(userRepository.save(user),"还可以吧！");
     }
 
+    @GetMapping("/sign")
+    public Response signup(User use){
+        User user=new User();
+        user.setUserName(use.getUserName());
+        String md5Password = DigestUtils.md5DigestAsHex(use.getPassWord().getBytes());
+        log.info(md5Password);
+        user.setPassWord(md5Password);
+        return Response.success(userRepository.save(user),"注册成功！");
+    }
+
+
     @GetMapping("/login")
     @ApiOperation("用户登录")
     public Response loginUser(User user){
+        //MD5加密
+        String md5Password = DigestUtils.md5DigestAsHex(user.getPassWord().getBytes());
+        log.info(md5Password);
         Map<String, Object> map = new HashMap<>();
         map.put("userid",user.getUserId());
         map.put("username",user.getUserName());
@@ -71,7 +87,7 @@ public class UserController {
         }else {
             User userdata=new User();
             userdata=userRepository.getById(user.getUserId());
-            if (user.getPassWord().equals(userdata.getPassWord())){
+            if (userdata.getPassWord().equals(md5Password)){
                 userdata.setToken(MyJwt.createJwt(60L,map));
                 userdata.setCt(String.valueOf(new Date(System.currentTimeMillis())));
 //                MyJwt.

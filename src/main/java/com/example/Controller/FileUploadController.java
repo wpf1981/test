@@ -6,10 +6,14 @@ import com.example.Repository.FilesRepostitory;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +28,7 @@ import java.util.*;
 @RequestMapping("/t2")
 @Api(tags = "上传接口")
 @RestController
+@CrossOrigin
 public class FileUploadController {
     @Resource
     FilesRepostitory filesRepostitory;
@@ -149,7 +154,7 @@ public class FileUploadController {
         return Response.success(list,"ok");
     }
 
-    @GetMapping("/filepage")
+    @GetMapping("/filePage")
     @ApiOperation("分页4")
     public Response filePage4(Files files){
         if (files.getPage() == null){
@@ -162,18 +167,35 @@ public class FileUploadController {
         Page<Files> list;
         log.info("userid::"+files.getUserId());
         if(files.getUserId()==null||files.getUserId().trim().isEmpty()) {
-            log.info("----------");
+//            log.info("----------");
             list = filesRepostitory.findAll(of);
         }else{
-            log.info("+++++++++++");
+//            log.info("+++++++++++");
             list = filesRepostitory.findFilename(files.getUserId(), of);
         }
-        log.info("page::" + list.getContent());
+//        log.info("page::" + list.getContent());
         Map map=new HashMap();
         map.put("page",files.getPage());
         map.put("limit",files.getLimit());
         map.put("count", list.getTotalElements());
         map.put("listData",list.getContent());
         return Response.success(map,"ok");
+    }
+
+    @Value("${myConfig.fileUrl}")
+    private String FILE_URL;
+
+    @GetMapping("/down")
+    ResponseEntity download(String fileName,HttpServletRequest req) throws Exception{
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+        Files ff = filesRepostitory.findByFileName(fileName);
+//        String URL="http://" + req.getServerName() + ":" + req.getServerPort() +"/files/"+dateFormat.format(ff.getCt());
+        String URL="d:/upload/"+dateFormat.format(ff.getCt());
+        log.info(URL);
+//        URL= URLEncoder.encode(URL,"UTF-8");
+        File dest=new File(URL,fileName);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE,"application/octet-stream")
+                .header(HttpHeaders.CONTENT_DISPOSITION,"attachment;filename="+fileName)
+                .body(new FileSystemResource(dest));
     }
 }
